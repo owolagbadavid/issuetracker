@@ -4,7 +4,7 @@ const assert = chai.assert;
 const server = require('../server');
 
 chai.use(chaiHttp);
-
+let issueTestId;
 suite('Functional Tests', function() {
 
     test('Create an issue with every field', function (done) {
@@ -14,6 +14,7 @@ suite('Functional Tests', function() {
         .send({"issue_title": "mad issues", "issue_text": "its actually bad", "created_by": "Mike", "status_text": "just opened", "assigned_to": "John"})
         .end(function (err, res) {
           assert.equal(res.status, 200);
+          issueTestId = res.body._id;
           assert.equal(res.body.issue_title, 'mad issues');
           assert.equal(res.body.issue_text, 'its actually bad');
           assert.equal(res.body.created_by, 'Mike');
@@ -115,11 +116,11 @@ suite('Functional Tests', function() {
       chai
         .request(server)
         .put('/api/issues/test')
-        .send({'_id':'6351b544b4857b0cb9729df3', 'created_by':'John'})
+        .send({'_id':issueTestId, 'created_by':'John'})
         .end(function (err, res) {
           assert.equal(res.status, 200);
           assert.equal(res.body.result, 'successfully updated')
-          assert.equal(res.body._id, '6351b544b4857b0cb9729df3')
+          assert.equal(res.body._id, issueTestId)
           done();
         });
     });
@@ -128,11 +129,11 @@ suite('Functional Tests', function() {
       chai
         .request(server)
         .put('/api/issues/test')
-        .send({'_id':'6351b544b4857b0cb9729df3', 'created_by':'John', 'assigned_to':'Mike'})
+        .send({'_id':issueTestId, 'created_by':'John', 'assigned_to':'Mike'})
         .end(function (err, res) {
           assert.equal(res.status, 200);
           assert.equal(res.body.result, 'successfully updated')
-          assert.equal(res.body._id, '6351b544b4857b0cb9729df3')
+          assert.equal(res.body._id, issueTestId)
           done();
         });
     });
@@ -153,11 +154,11 @@ test('Update an issue with no fields to update', function (done) {
       chai
         .request(server)
         .put('/api/issues/test')
-        .send({'_id':'6351b544b4857b0cb9729df3'})
+        .send({'_id':issueTestId})
         .end(function (err, res) {
           assert.equal(res.status, 200);
           assert.equal(res.body.error, 'no update field(s) sent');
-          assert.equal(res.body._id, '6351b544b4857b0cb9729df3');
+          assert.equal(res.body._id, issueTestId);
           done();
         });
     });
@@ -206,11 +207,11 @@ test('Update an issue with no fields to update', function (done) {
       chai
         .request(server)
         .delete('/api/issues/test')
-        .send({'_id': '6351b5b5a49c5c05a8300e82'})
+        .send({'_id': issueTestId})
         .end(function (err, res) {
           assert.equal(res.status, 200);
           assert.equal(res.body.result, 'successfully deleted');
-          assert.equal(res.body._id, '6351b5b5a49c5c05a8300e82')
+          assert.equal(res.body._id, issueTestId)
           done();
         });
   });
